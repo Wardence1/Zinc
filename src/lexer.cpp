@@ -52,11 +52,22 @@ bool isLetter(char ch) {
 
 void lex(ifstream& iFile) {
 
+    // Put file contents into a string
+    ostringstream oss;
+    oss << iFile.rdbuf();
+    string content = oss.str();
+    content += ';'; // Account for EOF
+
+    // Setup
     string lexeme;
     bool switched = false; // If the state switches this sets to true
     TokenType state, prevState = NEW, NEW;
+
+    // Go through file contents
     char ch;
-    while (iFile.get(ch)) {
+    for (int i = 0; i < content.size(); i++) {
+        
+        ch = content[i];
 
         /* Tokenize Everything */
         if (isDigit(ch)) { // number
@@ -84,12 +95,6 @@ void lex(ifstream& iFile) {
                 switched = true;
                 state = UNDEFINED;
             }
-        }
-
-        // End the section if EOF is next
-        if (iFile.peek() == EOF) {
-            switched = true;
-            lexeme += ch;
         }
         
         // Save token if the state switched
